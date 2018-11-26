@@ -1,2 +1,2 @@
-main: main.pas Subprogramas.pas
-	fpc main.pas
+snake: main.pas subprogramas.pas
+	fpc main.pas -osnake

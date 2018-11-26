@@ -5,15 +5,16 @@ program Snake_Pascal; (* Nombre del programa *)
               2018
 *)
 
-uses (* Unidades/Librerias que usa el programa *)
+uses	 (* Unidades/Librerias que usa el programa *)
     crt,
     Subprogramas;
 
 const
     TITULO_PROGRAMA = 'Snake';
 
-var
-	key: char;
+var	(* Declaración de variables y su uso *)
+
+	key: char; 		
 	arrow: boolean;
 	matriz: array of array of char;
 	seleccion: byte;
