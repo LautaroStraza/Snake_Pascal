@@ -6,48 +6,38 @@ program Snake_Pascal; (* Nombre del programa *)
 *)
 
 uses	 (* Unidades/Librerias que usa el programa *)
-    crt,
-    Subprogramas;
+	crt,
+	subprogramas;
 
 const
-    TITULO_PROGRAMA = 'Snake';
+	TITULO_PROGRAMA = 'Snake';
 
 var	(* Declaración de variables y su uso *)
 
-	key: char; 		
-	arrow: boolean;
-	matriz: array of array of char;
-	seleccion: byte;
+	key: char; 		(* Almacena la tecla presionada *)
+	arrow: boolean;		(* Controla que la tecla presionada sea una flecha *)
+	matriz: array of array of char;	(* Dibuja el escenario de la partida *)
+	seleccion: byte;	(* Almacena la opción ingresada en el menu *)
 
-	(* El siguiente vector guardara la siguiente información:
-		cuerpo[Nodo_serpiente, tipo_de_Nodo, pos_X, pos_Y] *)
+	(* El siguiente array guarda el tipo y la posición de todos los nodos de la serpiente *)
 	cuerpo: array of array [1..3] of integer;
-	(* Defino un índice para leer dentro del cuerpo de la serpiente *)
-	nodos: integer;
-	(* De este modo puedo referirme
-	a la cabeza de la serpiente como:
-			cuerpo[1, 1]= -1;
+	(* De este modo puedo leer
+	cuaquier nodo del cuerpo de la serpiente como:
+			cuerpo[nodo, 1]= tipo_de_nodo;
+					-1: Cabeza.
+					 0: Cuerpo..
+					 1: Cola.
 	cuya posición sera:
-			cuerpo[1, 2]= pos_x;
-			cuerpo[1, 3]= pos_y;
+			cuerpo[nodo, 2]= pos_x;
+			cuerpo[nodo, 3]= pos_y;	*)
 
-	a cuaquier nodo del cuerpo de la serpiente como:
-			cuerpo[nodos, 1]= 0;
-	cuya posición sera:
-			cuerpo[nodos, 2]= pos_x;
-			cuerpo[nodos, 3]= pos_y;
-	a la cola de la serpiente como:
-			cuerpo[nodos, 1]= 1;
-	cuya posición sera:
-			cuerpo[nodos, 2]= pos_x;
-			cuerpo[nodos, 3]= pos_y; *)
-
-	filas, columnas: integer; (* Para definir el tamaño de la matriz *)
-	f, c: integer; (* Indices para imprimir la matriz *)
-	pos_x, pos_y: integer;(* Indices para moverme dentro de la matriz *)
-	indice: integer; (* Para buscar dentro del cuerpo cual es la cola o la cabeza *)
-	aux: integer; (* Para buscar dentro del cuerpo cual es la cola o la cabeza *)
-	continuar: boolean;
+	nodos: integer;		(* Almacena la cantidad maxima de partes de la serpiente *)
+	filas, columnas: integer; 	(* Para definir el tamaño de la matriz *)
+	f, c: integer; 	(* Indices para imprimir la matriz *)
+	pos_x, pos_y: integer; (* Indices de proposito general *)
+	indice: integer; (* Para buscar dentro del cuerpo cual es la cola y la cabeza *)
+	aux: integer; (* Para buscar dentro del cuerpo cual es la cola y la cabeza *)
+	continuar: boolean; (* Condición para continuar la partida *)
 	ultimo_movimiento: integer;
 	puntos: integer;
 
@@ -85,103 +75,109 @@ end;
 
 (* Final de procedimientos y funciones particulares del programa *)
 
-begin (* Inicio programa principal *)
+begin	(* Inicio programa principal *)
 	Crear_Entorno(TITULO_PROGRAMA);
 
 	(* Inicializo variables *)
-	arrow:= false;
 	filas:= screenheight - 8; (* Defino la cantidad de filas según la ventana *)
         columnas:= screenwidth - 3; (*Defino la cantidad de columnas según la ventana *)
         SetLength(matriz, filas + 1, columnas); (* Defino el tamaño de la matriz *)
-	continuar:= true; (* Condición para seguir jugando *)
-	ultimo_movimiento:= 72; (* Comienza el juego moviendose hacia arriba *)
-	puntos:= 0;
-
-	nodos:= filas * columnas; (* Defino la cantidad de nodos máximos de la serpiente, que dependerá del tamaño de la matriz *)
+	(* Defino la cantidad de nodos máximos de la serpiente, que dependerá del tamaño de la matriz *)
+	nodos:= filas * columnas; 
 	(* Inicializo el cuerpo de Snake *)
         SetLength(cuerpo, nodos); (* Defino el tamaño de la matriz *)
-	for f:=1 to nodos do
-		begin
-		cuerpo[f, 1]:= 0;
-		cuerpo[f, 2]:= 0;
-		cuerpo[f, 3]:= 0;
-		end;
 
-
-        (* Inicializo la matriz *)
-        for f:=1 to filas do
-                begin
-                for c:=1 to columnas do
-                        begin
-                        matriz[f,c]:= ' ';
-                        end;
-                end;
-
-
-	(* Edito primera fila *)
-        for c:=1 to columnas do
-                matriz[1,c]:= '1';
-
-        (* Edito última fila *)
-        for c:=1 to columnas do
-                matriz[filas,c]:= '1';
-
-	WriteLn('Cantidad de filas:',filas);
-        WriteLn('Cantidad de columnas:',columnas);
-        WriteLn();
-
-	(* Elijo la posición inicial de la cabeza en el centro de la pantalla*)
-	pos_x:= filas div 2;
-	pos_y:= columnas div 2;
-
-	cuerpo[1,1]:= -1; (* Nodo cabeza de serpiente *)
-	cuerpo[1,2]:= pos_x;
-	cuerpo[1,3]:= pos_y;
-
-	cuerpo[2,1]:= 1; (* Nodo cabeza de serpiente *)
-	cuerpo[2,2]:= pos_x;
-	cuerpo[2,3]:= pos_y - 1 ;
-
-	matriz[cuerpo[1,2], cuerpo[1,3]]:= 'X';
-	matriz[cuerpo[2,2], cuerpo[2,3]]:= 'X';
-
-	(* Muestro menu con opciones *)
+	(* Muestro menu principal *)
 	repeat
         seleccion:= Menu();
         case (seleccion) of
             1:
-		begin
-		repeat
-			(* Imprimo la matriz y espero a que se precione una tecla *)
-			for f:=1 to filas do
+		begin (*Comienzo una nueva partida *)
+		
+		(* Inicializo variables *)
+		arrow:= false;
+		continuar:= true;
+		puntos:= 0;
+		ultimo_movimiento:= 72; (* Comienza el juego moviendose hacia arriba *)
+
+		(* Inicializo la serpiente *)
+		for f:=1 to nodos do
+			begin
+			cuerpo[f, 1]:= 0;
+			cuerpo[f, 2]:= 0;
+			cuerpo[f, 3]:= 0;
+			end;
+
+
+		(* Inicializo la matriz *)
+		for f:=1 to filas do
+			begin
+			for c:=1 to columnas do
 				begin
-				for c:=1 to columnas do
-					begin
-					Write(matriz[f,c]);
-					end;
-				WriteLn();
+				matriz[f,c]:= ' ';
 				end;
+			end;
 
-			puntos:= puntos + 1;
 
-			(* Agrego comida aleatoriamente *)
-			pos_x:= random(columnas-1)+1;
-			pos_y:= random(filas-1)+1;
-			if (matriz[pos_y, pos_x] = ' ') and (puntos mod 50 = 0) then
-				matriz[pos_y, pos_x]:= 'o';
+		(* Edito primera fila de la matriz *)
+		for c:=1 to columnas do
+			matriz[1,c]:= '1';
 
-			Delay(100);					(* Tiempo entre "FPS's" *)
+		(* Edito última fila de la matriz *)
+		for c:=1 to columnas do
+			matriz[filas,c]:= '1';
 
-			if (KeyPressed()) then				(* Solo leo la tecla si se apreto algo ese segundo *)
+		(* Selecciono la posición inicial de la cabeza en el centro de la pantalla *)
+		pos_x:= filas div 2;
+		pos_y:= columnas div 2;
+
+		cuerpo[1,1]:= -1; (* Nodo cabeza de serpiente *)
+		cuerpo[1,2]:= pos_x;
+		cuerpo[1,3]:= pos_y;
+
+		cuerpo[2,1]:= 1; (* Nodo cabeza de serpiente *)
+		cuerpo[2,2]:= pos_x;
+		cuerpo[2,3]:= pos_y - 1 ;
+
+		(* Dibujo los dos nodos iniciales de la serpiente en la matriz *)
+		matriz[cuerpo[1,2], cuerpo[1,3]]:= 'X';
+		matriz[cuerpo[2,2], cuerpo[2,3]]:= 'X';
+
+		repeat
+		(* Imprimo la matriz y espero a que se precione una tecla *)
+		for f:=1 to filas do
+			begin
+			for c:=1 to columnas do
 				begin
-				key:= ReadKey();			(* Guardo en "key" la tecla presionada *)
-				if ord(key) = 0 then				(* Los caracteres especiales comienzan con este valor *)
+				Write(matriz[f,c]);
+				end;
+			WriteLn();
+			end;
+
+		(* Sumo puntos cada vuelta *)
+		puntos:= puntos + 1;
+
+		(* Agrego comida aleatoriamente *)
+		pos_x:= random(columnas-1)+1;
+		pos_y:= random(filas-1)+1;
+
+		(* La primera condición evalua si hay espacio
+			y la segunda es una manera de controlar el tiempo *)
+		if (matriz[pos_y, pos_x] = ' ') and (puntos mod 50 = 0) then
+			matriz[pos_y, pos_x]:= 'o';
+
+		Delay(100);	(* Tiempo entre vueltas / Tiempo entre "FPS's" *)
+
+		if (KeyPressed()) then				(* Solo leo la tecla si se apreto en ese momento *)
+			begin
+			key:= ReadKey();			(* Guardo en "key" la tecla presionada *)
+			if ord(key) = 0 then				(* Los caracteres especiales comienzan con este valor *)
+				begin
+				key:= ReadKey();			(* Tengo que leer dos veces para saber el valor del caracter especial *)
+				arrow:= ord(key) in [72, 80, 75, 77];	(* Si el valor de la tecla corresponde a una flecha lo acepto como opción *)
+				if (arrow) then 	(*Condicionales para que no moverse hacia atras *)
 					begin
-					key:= ReadKey();			(* Tengo que leer dos veces para saber el valor del caracter especial *)
-					arrow:= ord(key) in [72, 80, 75, 77];	(* Si el valor de la tecla corresponde a una flecha lo acepto como opción *)
-					if (arrow) then 	(*Condicionales para que no pueda volver para atras *)
-						begin
-						case ord(key) of
+					case ord(key) of
 						72: (*arriba*)
 							begin
 							if (ultimo_movimiento <> 80) then
@@ -203,19 +199,20 @@ begin (* Inicio programa principal *)
 								ultimo_movimiento:= ord(key);
 							end;
 						end;
-						end;
-					end
-				else
-					begin
-					arrow:= false;
 					end;
+				end
+			else
+				begin
+				arrow:= false;
 				end;
+			end;
 
-			case ultimo_movimiento of			(* Las opciones a seguir para cada flecjha *)
+			(* Las opciones a seguir para cada flecha presionada *)
+			case ultimo_movimiento of
 				72:
 					begin (* Arriba *)
 					ultimo_movimiento:= 72;
-					(* Busco el nodo cola para borrarlo y asignar la cola en la posición del nodo anterior *)
+					(* Busco el nodo de la cola para borrarlo y asignar la cola en la posición del nodo anterior *)
 					for indice:= nodos downto 2 do
 						begin
 						if (cuerpo[indice,1] = 1) then (* Nodo de la cola *)
@@ -249,8 +246,7 @@ begin (* Inicio programa principal *)
 						begin
 						if (cuerpo[indice,1] = -1) then (* Nodo de la cabeza *)
 							begin
-
-							if (cuerpo[indice,2] > 1) then
+							if (cuerpo[indice,2] > 1) then (* Controlo que esté dentro del espacio disponible *)
 								cuerpo[indice,2]:= cuerpo[indice,2] - 1 ;
 							if (cuerpo[indice,2] = 1) then
 								continuar:= false;
@@ -261,7 +257,7 @@ begin (* Inicio programa principal *)
 				80:
 					begin (* Abajo *)
 					ultimo_movimiento:= 80;
-					(* Busco el nodo cola para borrarlo y asignar la cola en la posición del nodo anterior *)
+					(* Busco el nodo de la cola para borrarlo y asignar la cola en la posición del nodo anterior *)
 					for indice:= nodos downto 2 do
 						begin
 						if (cuerpo[indice,1] = 1) then (* Nodo de la cola *)
@@ -295,8 +291,7 @@ begin (* Inicio programa principal *)
 						begin
 						if (cuerpo[indice,1] = -1) then (* Nodo de la cabeza *)
 							begin
-
-							if (cuerpo[indice,2] < filas) then
+							if (cuerpo[indice,2] < filas) then (* Controlo que esté dentro del espacio disponible *)
 								cuerpo[indice,2]:= cuerpo[indice,2] + 1 ;
 							if (cuerpo[indice,2] = filas) then
 								continuar:= false;
@@ -307,7 +302,7 @@ begin (* Inicio programa principal *)
 				75:
 					begin (* Izquierda *)
 					ultimo_movimiento:= 75;
-					(* Busco el nodo cola para borrarlo y asignar la cola en la posición del nodo anterior *)
+					(* Busco el nodo de la cola para borrarlo y asignar la cola en la posición del nodo anterior *)
 					for indice:= nodos downto 2 do
 						begin
 						if (cuerpo[indice,1] = 1) then (* Nodo de la cola *)
@@ -341,8 +336,7 @@ begin (* Inicio programa principal *)
 						begin
 						if (cuerpo[indice,1] = -1) then (* Nodo de la cabeza *)
 							begin
-
-							if (cuerpo[indice,3] > 0) then
+							if (cuerpo[indice,3] > 0) then (* Controlo que esté dentro del espacio disponible *)
 								cuerpo[indice,3]:= cuerpo[indice,3] - 1 ;
 							if (cuerpo[indice,3] = 0) then
 								continuar:= false;
@@ -353,7 +347,7 @@ begin (* Inicio programa principal *)
 				77:
 					begin (* Derecha *)
 					ultimo_movimiento:= 77;
-					(* Busco el nodo cola para borrarlo y asignar la cola en la posición del nodo anterior *)
+					(* Busco el nodo de la cola para borrarlo y asignar la cola en la posición del nodo anterior *)
 					for indice:= nodos downto 2 do
 						begin
 						if (cuerpo[indice,1] = 1) then (* Nodo de la cola *)
@@ -387,8 +381,7 @@ begin (* Inicio programa principal *)
 						begin
 						if (cuerpo[indice,1] = -1) then (* Nodo de la cabeza *)
 							begin
-
-							if (cuerpo[indice,3] < columnas + 1) then
+							if (cuerpo[indice,3] < columnas + 1) then (* Controlo que esté dentro del espacio disponible *)
 								cuerpo[indice,3]:= cuerpo[indice,3] + 1 ;
 							if (cuerpo[indice,3] = columnas +1) then
 								continuar:= false;
@@ -397,7 +390,7 @@ begin (* Inicio programa principal *)
 						end;
 					end;
 				end;
-		until (continuar <> true); 					(* Condición continuar termina la partida *)
+		until (continuar <> true); 		(* Condición continuar/terminar la partida *)
 		ClrScr();
 		WriteLn('Puntuación final: ', puntos);
 		WriteLn('Enter para salir...');

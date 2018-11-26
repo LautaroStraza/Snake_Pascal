@@ -1,18 +1,18 @@
 unit Subprogramas; (* Nombre de la Unidad/Libreria *)
-interface (* Encabezados de los subprogramas *)
 
-procedure Enmarcar_Pantalla ();
-procedure Enmarcar_Titulo (const titulo: string);
-procedure Crear_Ventana();
-procedure Crear_Entorno(const titulo: string);
+interface (* Encabezados de los subprogramas *)
+	procedure Enmarcar_Pantalla ();
+	procedure Enmarcar_Titulo (const titulo: string);
+	procedure Crear_Ventana();
+	procedure Crear_Entorno(const titulo: string);
 
 implementation (* Desarrollo de los subprogramas *)
-
 uses (* Unidades/Librerias que usan los subprogramas *)
 	crt,
 	strings;
 
-(* Procedimiento que recibe un título de una sola linea y lo enmarca *)
+(* Procedimiento que recibe un título como string
+	 y lo enmarca en el centro de la ventana *)
 procedure Enmarcar_Titulo (const titulo: string);
 (* Para este procedimiento es necesario usar la unidad strings *)
 var
@@ -63,30 +63,30 @@ end;
 (* Procedimiento que enmarca la pantalla del programa *)
 procedure Enmarcar_Pantalla ();
 var 
-    i, altura, ancho: integer;
+    aux, altura, ancho: integer;
 begin
 	altura:= screenheight; (* Reviso la altura de la ventana actual *)
 	ancho:= screenwidth; (* Reviso el ancho de la ventana actual *)
 	
 	ClrScr();
 	gotoxy(1,1); (* Dibujo el marco de arriba *)
-	for i:= 1 to ancho do
+	for aux:= 1 to ancho do
 		Write('#');
 
-	for i:= 2 to altura-1 do (* Dibujo el marco de la izquierda *)
+	for aux:= 2 to altura-1 do (* Dibujo el marco de la izquierda *)
 		begin
-		gotoxy(1,i);
+		gotoxy(1,aux);
 		Write('|');
 		end;
 
-	for i:= 2 to altura-1 do (* Dibujo el marco de la derecha *)
+	for aux:= 2 to altura-1 do (* Dibujo el marco de la derecha *)
 		begin
-		gotoxy(ancho,i);
+		gotoxy(ancho,aux);
 		Write('|');
 		end;
 
 	gotoxy(1,altura-1); (* Dibujo el marco de abajo *)
-	for i:= 1 to ancho do
+	for aux:= 1 to ancho do
 		Write('#');
 
 	gotoxy(2,2); (* Posiciono el cursor al comienzo del primer renglón *)
@@ -99,7 +99,7 @@ var
 begin
 	altura:= screenheight; (* Reviso la altura de la ventana actual *)
 	ancho:= screenwidth; (* Reviso el ancho de la ventana actual *)
-	Window(2,6,ancho -1,altura-2); 
+	Window(2,6,ancho -1,altura-2); (* Inicia en las coordenadas (2,6) para no pisar el marco *)
 	gotoxy(1,1); (* Posiciono el cursor al comienzo del primer renglón *)
 end;
 
@@ -112,15 +112,14 @@ begin
 end;
 
 
-initialization
+initialization	(* Instrucciones que se ejecutaran al cargar la unidad *) 
 begin
-	(* Instrucciones que se ejecutaran al cargar la unidad *) 
 	ClrScr();
 end;
  
-finalization
+finalization	(* Instrucciones que se ejecutaran al finalizar el programa *)
 begin
-	(* Instrucciones que se ejecutaran al finalizar el programa *) 
+	(* Destruyo la ventana interna construida para el programa *)
 	Window(1,1,screenwidth,screenheight);
 	gotoxy(screenwidth,screenheight-1);
 	WriteLn();
