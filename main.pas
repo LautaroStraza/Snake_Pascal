@@ -143,8 +143,7 @@ begin	(* Inicio programa principal *)
 		matriz[cuerpo[1,2], cuerpo[1,3]]:= 'X';
 		matriz[cuerpo[2,2], cuerpo[2,3]]:= 'X';
 
-		repeat
-		(* Imprimo la matriz y espero a que se precione una tecla *)
+		(* Imprimo la matriz completa una vez *)
 		for f:=1 to filas do
 			begin
 			for c:=1 to columnas do
@@ -152,6 +151,23 @@ begin	(* Inicio programa principal *)
 				Write(matriz[f,c]);
 				end;
 			WriteLn();
+			end;
+
+
+		repeat
+
+		(* Imprimo los cambios de la matriz y espero que se precione una tecla *)
+		for f:=1 to filas do
+			begin
+			for c:=1 to columnas do
+				begin
+				if (matriz[f,c] <> ' ') then
+					begin
+					gotoxy(c,f);
+					Write(matriz[f,c]);
+					end;
+				end;
+			gotoxy(1,filas+1);
 			end;
 
 		(* Sumo puntos cada vuelta *)
@@ -220,6 +236,9 @@ begin	(* Inicio programa principal *)
 							if (matriz[cuerpo[1,2]-1, cuerpo[1,3]] = 'o') then (* Dejo que crezca si el punto sobre la cabeza era comida *)
 									begin
 									matriz[cuerpo[indice,2], cuerpo[indice,3]]:= ' '; (* Limpio la posición vieja *)
+									gotoxy(cuerpo[indice,3], cuerpo[indice,2]);
+									Write(matriz[cuerpo[indice,2], cuerpo[indice,3]]);
+									gotoxy(1,filas+1);
 									cuerpo[indice,1]:= 0; (* La cola se vuelve un nodo común *)
 									cuerpo[indice+1,1]:= 1; (* Se agrega un nodo y se convierte en la nueva cola *)
 									for aux:=indice+1 downto 2 do
@@ -231,6 +250,9 @@ begin	(* Inicio programa principal *)
 								else
 									begin
 									matriz[cuerpo[indice,2], cuerpo[indice,3]]:= ' '; (* Limpio la posición vieja *)
+									gotoxy(cuerpo[indice,3], cuerpo[indice,2]);
+									Write(matriz[cuerpo[indice,2], cuerpo[indice,3]]);
+									gotoxy(1,filas+1);
 									for aux:=indice downto 2 do
 										begin
 										cuerpo[aux,2]:= cuerpo[aux-1,2];
@@ -265,6 +287,9 @@ begin	(* Inicio programa principal *)
 							if (matriz[cuerpo[1,2]+1, cuerpo[1,3]] = 'o') then (* Dejo que crezca si el punto debajo de la cabeza era comida *)
 									begin
 									matriz[cuerpo[indice,2], cuerpo[indice,3]]:= ' '; (* Limpio la posición vieja *)
+									gotoxy(cuerpo[indice,3], cuerpo[indice,2]);
+									Write(matriz[cuerpo[indice,2], cuerpo[indice,3]]);
+									gotoxy(1,filas+1);
 									cuerpo[indice,1]:= 0; (* La cola se vuelve un nodo común *)
 									cuerpo[indice+1,1]:= 1; (* Se agrega un nodo y se convierte en la nueva cola *)
 									for aux:=indice+1 downto 2 do
@@ -276,6 +301,9 @@ begin	(* Inicio programa principal *)
 								else
 									begin
 									matriz[cuerpo[indice,2], cuerpo[indice,3]]:= ' '; (* Limpio la posición vieja *)
+									gotoxy(cuerpo[indice,3], cuerpo[indice,2]);
+									Write(matriz[cuerpo[indice,2], cuerpo[indice,3]]);
+									gotoxy(1,filas+1);
 									for aux:=indice downto 2 do
 										begin
 										cuerpo[aux,2]:= cuerpo[aux-1,2];
@@ -310,6 +338,9 @@ begin	(* Inicio programa principal *)
 							if (matriz[cuerpo[1,2], cuerpo[1,3]-1] = 'o') then (* Dejo que crezca si el punto a la izquierda de la cabeza era comida *)
 									begin
 									matriz[cuerpo[indice,2], cuerpo[indice,3]]:= ' '; (* Limpio la posición vieja *)
+									gotoxy(cuerpo[indice,3], cuerpo[indice,2]);
+									Write(matriz[cuerpo[indice,2], cuerpo[indice,3]]);
+									gotoxy(1,filas+1);
 									cuerpo[indice,1]:= 0; (* La cola se vuelve un nodo común *)
 									cuerpo[indice+1,1]:= 1; (* Se agrega un nodo y se convierte en la nueva cola *)
 									for aux:=indice+1 downto 2 do
@@ -321,6 +352,9 @@ begin	(* Inicio programa principal *)
 								else
 									begin
 									matriz[cuerpo[indice,2], cuerpo[indice,3]]:= ' '; (* Limpio la posición vieja *)
+									gotoxy(cuerpo[indice,3], cuerpo[indice,2]);
+									Write(matriz[cuerpo[indice,2], cuerpo[indice,3]]);
+									gotoxy(1,filas+1);
 									for aux:=indice downto 2 do
 										begin
 										cuerpo[aux,2]:= cuerpo[aux-1,2];
@@ -355,6 +389,9 @@ begin	(* Inicio programa principal *)
 							if (matriz[cuerpo[1,2], cuerpo[1,3]+1] = 'o') then (* Dejo que crezca si el punto a la derecha de la cabeza era comida *)
 									begin
 									matriz[cuerpo[indice,2], cuerpo[indice,3]]:= ' '; (* Limpio la posición vieja *)
+									gotoxy(cuerpo[indice,3], cuerpo[indice,2]);
+									Write(matriz[cuerpo[indice,2], cuerpo[indice,3]]);
+									gotoxy(1,filas+1);
 									cuerpo[indice,1]:= 0; (* La cola se vuelve un nodo común *)
 									cuerpo[indice+1,1]:= 1; (* Se agrega un nodo y se convierte en la nueva cola *)
 									for aux:=indice+1 downto 2 do
@@ -366,6 +403,9 @@ begin	(* Inicio programa principal *)
 								else
 									begin
 									matriz[cuerpo[indice,2], cuerpo[indice,3]]:= ' '; (* Limpio la posición vieja *)
+									gotoxy(cuerpo[indice,3], cuerpo[indice,2]);
+									Write(matriz[cuerpo[indice,2], cuerpo[indice,3]]);
+									gotoxy(1,filas+1);
 									for aux:=indice downto 2 do
 										begin
 										cuerpo[aux,2]:= cuerpo[aux-1,2];
