@@ -172,6 +172,7 @@ begin	(* Inicio programa principal *)
 
 		(* Sumo puntos cada vuelta *)
 		puntos:= puntos + 1;
+		write('Puntaje: ',puntos);
 
 		(* Agrego comida aleatoriamente *)
 		pos_x:= random(columnas-1)+1;
